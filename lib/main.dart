@@ -91,6 +91,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 fontSize: 25.0,
               )),
           toolbarHeight: 50.0,
+          //insert a button to refresh the quote in the appbar
+          actions: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    getquotes();
+                  });
+                },
+                icon: const Icon(Icons.refresh))
+          ],
         ),
         body: Center(
             // Center is a layout widget. It takes a single child and positions it
