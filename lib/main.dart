@@ -109,6 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         fontSize: 15.0,
                         color: Colors.amberAccent
                       ));
+                } else if (snapshot.hasError) {
+                  return const Text("Erro ao carregar a cotação",
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.amberAccent
+                      ));
                 } else {
                   return const CircularProgressIndicator();
                 }
