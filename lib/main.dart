@@ -110,6 +110,15 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Container(
+                padding: const EdgeInsets.all(10.0),
+                child: const Icon(
+                  //bitcoin icon
+                  Icons.monetization_on_rounded,
+                  size: 30.0,
+                  color: Colors.amberAccent,
+                ),
+              ),
               FutureBuilder(
                   future: getquotes(),
                   builder: (context, snapshot) {
