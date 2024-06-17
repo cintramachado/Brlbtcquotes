@@ -110,25 +110,22 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FutureBuilder(future: getquotes(),
-               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  final Map data = json.decode(snapshot.data.toString());
-                  return Text("Btc/Brl ${data["last"].toString()}",
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        color: Colors.amberAccent
-                      ));
-                } else if (snapshot.hasError) {
-                  return const Text("Erro ao carregar a cotação",
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        color: Colors.amberAccent
-                      ));
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              }),
+              FutureBuilder(
+                  future: getquotes(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      final Map data = json.decode(snapshot.data.toString());
+                      return Text("Btc/Brl ${data["last"].toString()}",
+                          style: const TextStyle(
+                              fontSize: 15.0, color: Colors.amberAccent));
+                    } else if (snapshot.hasError) {
+                      return const Text("Erro ao carregar a cotação",
+                          style: TextStyle(
+                              fontSize: 15.0, color: Colors.amberAccent));
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  }),
               const Divider(
                 color: Colors.black12,
               ),
@@ -136,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const Divider(
                 color: Colors.black,
               ),
-              entrarmoeda("Btc", "btl", btccontroller),
+              entrarmoeda("Btc", "btc", btccontroller),
               const Divider(
                 color: Colors.black,
               ),
