@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+import "dart:core";
 
 void main() {
-  runApp(const MyApp());
+  print(getquotes());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+
 
   // This widget is the root of your application.
   @override
@@ -37,6 +42,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
+Future<void> getquotes() async {
+  var uriquote = Uri.parse("https://cointradermonitor.com/api/pbb/v1/ticker");
+  final jsonreturn = await http.get(uriquote);
+
+
+  print(jsonreturn.body);
+}
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -49,7 +62,7 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
+  final title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -108,8 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Widget entrarmoeda(
-    String moeda, String hinttext, TextEditingController textcontroller) {
+Widget entrarmoeda(moeda, hinttext, TextEditingController textcontroller) {
   return Container(
       padding: const EdgeInsets.all(20.0),
       child: TextFormField(
