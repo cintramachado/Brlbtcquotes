@@ -6,13 +6,10 @@ import 'package:http/http.dart' as http;
 import "dart:core";
 
 void main() {
-  print(getquotes());
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -42,12 +39,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<void> getquotes() async {
+Future getquotes() async {
   var uriquote = Uri.parse("https://cointradermonitor.com/api/pbb/v1/ticker");
-  final jsonreturn = await http.get(uriquote);
+  final response = await http.get(uriquote);
 
-
-  print(jsonreturn.body);
+  return response.body;
 }
 
 class MyHomePage extends StatefulWidget {
@@ -72,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final realcontroller = TextEditingController();
   final btccontroller = TextEditingController();
   final satoshicontroller = TextEditingController();
+  final current = getquotes();
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +100,19 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              FutureBuilder(future: getquotes(),
+               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  final Map data = json.decode(snapshot.data.toString());
+                  return Text("Btc/Brl ${data["last"].toString()}",
+                      style: const TextStyle(
+                        fontSize: 15.0,
+                        color: Colors.amberAccent
+                      ));
+                } else {
+                  return const CircularProgressIndicator();
+                }
+              }),
               const Divider(
                 color: Colors.black12,
               ),
