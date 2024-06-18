@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import "package:intl/intl.dart";
 
 import "dart:core";
 
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
           useMaterial3: true,
           scaffoldBackgroundColor: Colors.black),
-      home: const MyHomePage(title: 'BitQuote'),
+      home: MyHomePage(title: 'BitQuote'),
     );
   }
 }
@@ -45,11 +46,11 @@ Future getquotes() async {
   var uriquote = Uri.parse("https://cointradermonitor.com/api/pbb/v1/ticker");
   final response = await http.get(uriquote);
 
-  return jsonDecode(response.body);
+  return response.body;
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -73,27 +74,45 @@ class _MyHomePageState extends State<MyHomePage> {
   final current = getquotes();
 
   double btc = 0.0;
+  final localformat = NumberFormat.simpleCurrency();
 
-  void satoshichange() {
-    realcontroller.text =
-        (double.parse(satoshicontroller.text) / 100000000).toString();
-    btccontroller.text =
-        (double.parse(satoshicontroller.text) / 100000000).toString();
+  satoshichange() {
+    try {
+      realcontroller.text = (localformat
+          .format((double.parse(satoshicontroller.text) / 100000000) * btc));
+
+      btccontroller.text = (double.parse(satoshicontroller.text) / 100000000)
+          .toStringAsPrecision(15);
+    } catch (e) {
+      realcontroller.text = "";
+      btccontroller.text = "";
+    }
   }
 
-  void btcchange() {
-    realcontroller.text = (double.parse(btccontroller.text) * btc).toString();
-
-    satoshicontroller.text =
-        (double.parse(btccontroller.text) * 100000000).toString();
+  btcchange() {
+    try {
+      realcontroller.text =
+          localformat.format(double.parse(btccontroller.text) * btc);
+      satoshicontroller.text = (double.parse(btccontroller.text) * 100000000)
+          .toStringAsPrecision(15);
+    } catch (e) {
+      realcontroller.text = "";
+      satoshicontroller.text = "";
+    }
   }
 
-  void realchange() {
-    btccontroller.text =
-        (double.parse(realcontroller.text) / double.parse(btccontroller.text))
-            .toString();
-    satoshicontroller.text =
-        (double.parse(realcontroller.text) * 100000000).toString();
+  realchange() {
+    try {
+      btccontroller.text =
+          (double.parse(realcontroller.text) / btc).toStringAsPrecision(15);
+      satoshicontroller.text =
+          ((double.parse(realcontroller.text) / btc) * 100000000)
+              .toStringAsPrecision(15);
+    } catch (e) {
+      btccontroller.text = "";
+      satoshicontroller.text = "";
+    }
+   
   }
 
   @override
@@ -145,15 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              /* Tab(
-                child: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: const Image(
-                      image: AssetImage("../assets/bitcoin.ico"),
-                      color: Colors.amberAccent,
-                    )),
-              ), */
-              // insira icon monetary rounded
               const Icon(
                 Icons.monetization_on_rounded,
                 size: 30.0,
@@ -164,7 +174,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       final Map data = json.decode(snapshot.data.toString());
-                      btc = data["last"];
+                      btc = double.parse(data["last"].toString());
+
                       return Text(
                         "Btc/Brl ${data["last"].toString()}",
                         style: const TextStyle(
@@ -181,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const Divider(
                 color: Colors.black12,
               ),
-              entrarmoeda("Reais", "R\$", realcontroller),
+              entrarmoeda("Reais", "R\$", realcontroller, realchange),
               const Divider(
                 color: Colors.black,
               ),
