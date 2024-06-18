@@ -138,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
               const Divider(
                 color: Colors.black12,
               ),
+              
               entrarmoeda("Reais", "R\$", realcontroller),
               const Divider(
                 color: Colors.black,
