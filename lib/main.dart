@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 import "dart:core";
@@ -43,7 +45,7 @@ Future getquotes() async {
   var uriquote = Uri.parse("https://cointradermonitor.com/api/pbb/v1/ticker");
   final response = await http.get(uriquote);
 
-  return response.body;
+  return jsonDecode(response.body);
 }
 
 class MyHomePage extends StatefulWidget {
@@ -69,6 +71,39 @@ class _MyHomePageState extends State<MyHomePage> {
   final btccontroller = TextEditingController();
   final satoshicontroller = TextEditingController();
   final current = getquotes();
+
+  double btc = 0.0;
+
+  void satoshichange() {
+    realcontroller.text =
+        (double.parse(satoshicontroller.text) / 100000000).toString();
+    btccontroller.text =
+        (double.parse(satoshicontroller.text) / 100000000).toString();
+  }
+
+  void btcchange() {
+    realcontroller.text = (double.parse(btccontroller.text) * btc).toString();
+
+    satoshicontroller.text =
+        (double.parse(btccontroller.text) * 100000000).toString();
+  }
+
+  void realchange() {
+    btccontroller.text =
+        (double.parse(realcontroller.text) / double.parse(btccontroller.text))
+            .toString();
+    satoshicontroller.text =
+        (double.parse(realcontroller.text) * 100000000).toString();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    realcontroller.dispose();
+    btccontroller.dispose();
+    satoshicontroller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,23 +145,31 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(10.0),
-                child: const Icon(
-                  //bitcoin icon
-                  Icons.monetization_on_rounded,
-                  size: 30.0,
-                  color: Colors.amberAccent,
-                ),
+              /* Tab(
+                child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: const Image(
+                      image: AssetImage("../assets/bitcoin.ico"),
+                      color: Colors.amberAccent,
+                    )),
+              ), */
+              // insira icon monetary rounded
+              const Icon(
+                Icons.monetization_on_rounded,
+                size: 30.0,
+                color: Colors.amberAccent,
               ),
               FutureBuilder(
                   future: getquotes(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       final Map data = json.decode(snapshot.data.toString());
-                      return Text("Btc/Brl ${data["last"].toString()}",
-                          style: const TextStyle(
-                              fontSize: 15.0, color: Colors.amberAccent));
+                      btc = data["last"];
+                      return Text(
+                        "Btc/Brl ${data["last"].toString()}",
+                        style: const TextStyle(
+                            fontSize: 15.0, color: Colors.amberAccent),
+                      );
                     } else if (snapshot.hasError) {
                       return const Text("Erro ao carregar a cotação",
                           style: TextStyle(
@@ -138,23 +181,23 @@ class _MyHomePageState extends State<MyHomePage> {
               const Divider(
                 color: Colors.black12,
               ),
-              
               entrarmoeda("Reais", "R\$", realcontroller),
               const Divider(
                 color: Colors.black,
               ),
-              entrarmoeda("Btc", "btc", btccontroller),
+              entrarmoeda("Btc", "btc", btccontroller, btcchange),
               const Divider(
                 color: Colors.black,
               ),
-              entrarmoeda("Satoshis", "sat", satoshicontroller)
+              entrarmoeda("Satoshis", "sat", satoshicontroller, satoshichange),
             ],
           ),
         )));
   }
 }
 
-Widget entrarmoeda(moeda, hinttext, TextEditingController textcontroller) {
+Widget entrarmoeda(
+    moeda, hinttext, TextEditingController textcontroller, Function funcao) {
   return Container(
       padding: const EdgeInsets.all(20.0),
       child: TextFormField(
@@ -172,7 +215,9 @@ Widget entrarmoeda(moeda, hinttext, TextEditingController textcontroller) {
         ),
         keyboardType: TextInputType.number,
         cursorColor: Colors.amberAccent,
-        onChanged: (value) {},
+        onChanged: (value) {
+          funcao();
+        },
         controller: textcontroller,
       ));
 }
